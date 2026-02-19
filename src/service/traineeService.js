@@ -42,5 +42,15 @@ export function createTraineeService(storage) {
     return trainee;
   }
 
-  return [addTrainee, updateTrainee, deleteTrainee, getTraineeById];
+  function getAllTrainee(){
+    const allTrainee = storage.loadTraineeData();
+     const sortedTrainee = [...allTrainee].sort((a, b) =>
+    a.lastName.localeCompare(b.lastName)
+  );
+  return [sortedTrainee,allTrainee.length]
+
+
+  }
+
+  return [addTrainee, updateTrainee, deleteTrainee, getTraineeById,getAllTrainee];
 }

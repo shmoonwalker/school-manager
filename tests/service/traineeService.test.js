@@ -76,7 +76,8 @@ describe('Trainee Service', () => {
       saveTraineeData: () => {},
     };
 
-    const [addTrainee,updatedTrainee,deleteTrainee,getTraineeById] = createTraineeService(mockStorage);
+    const [addTrainee, updatedTrainee, deleteTrainee, getTraineeById] =
+      createTraineeService(mockStorage);
     const trainee = getTraineeById(2);
 
     expect(trainee).toMatchObject({
@@ -84,5 +85,31 @@ describe('Trainee Service', () => {
       firstName: 'John',
       lastName: 'Doe',
     });
+  });
+  test('should get all trainees sorted by last name and return the total count', () => {
+    const mockStorage = {
+      loadTraineeData: () => [
+        { id: 1, firstName: 'Jane', lastName: 'Smith' },
+        { id: 2, firstName: 'John', lastName: 'Doe' },
+        { id: 3, firstName: 'Alice', lastName: 'Johnson' },
+      ],
+      saveTraineeData: () => {},
+    };
+
+    const [
+      addTrainee,
+      updatedTrainee,
+      deleteTrainee,
+      getTraineeById,
+      getAllTrainee,
+    ] = createTraineeService(mockStorage);
+    const [sortedTrainees, totalCount] = getAllTrainee();
+
+    expect(sortedTrainees).toEqual([
+      { id: 2, firstName: 'John', lastName: 'Doe' },
+      { id: 3, firstName: 'Alice', lastName: 'Johnson' },
+      { id: 1, firstName: 'Jane', lastName: 'Smith' },
+    ]);
+    expect(totalCount).toBe(3);
   });
 });
