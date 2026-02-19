@@ -27,5 +27,13 @@ export function createTraineeService(storage) {
     return { id: id, firstName: fName, lastName: lName };
   }
 
-  return [addTrainee, updateTrainee];
+  function deleteTrainee(id) {
+    const allTrainee = storage.loadTraineeData();
+
+    const updatedTrainees = allTrainee.filter((trainee) => trainee.id !== id);
+
+    storage.saveTraineeData(updatedTrainees);
+  } 
+
+  return [addTrainee, updateTrainee, deleteTrainee];
 }

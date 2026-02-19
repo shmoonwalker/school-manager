@@ -46,4 +46,25 @@ describe('Trainee Service', () => {
       lastName: 'Doe',
     });
   });
+  //write a unit test for deleteTrainee function
+  test('should delete a trainee and not return anything', () => {
+    const mockStorage = {
+      loadTraineeData: () => [
+        { id: 1, firstName: 'Jane', lastName: 'Smith' },
+        { id: 2, firstName: 'John', lastName: 'Doe' },
+      ],
+      saveTraineeData: (data) => {
+        expect(data).toHaveLength(1);
+        expect(data[0]).toMatchObject({
+          id: 1,
+          firstName: 'Jane',
+          lastName: 'Smith',
+        });
+      },
+    };
+
+    const [addTrainee, updateTrainee, deleteTrainee] =
+      createTraineeService(mockStorage);
+    deleteTrainee(2);
+  });
 });
