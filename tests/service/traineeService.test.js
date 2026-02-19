@@ -23,4 +23,27 @@ describe('Trainee Service', () => {
       lastName: 'Doe',
     });
   });
+
+  test('should update a trainee and return the updated trainee object', () => {
+    const mockStorage = {
+      loadTraineeData: () => [{ id: 1, firstName: 'Jane', lastName: 'Smith' }],
+      saveTraineeData: (data) => {
+        expect(data).toHaveLength(1);
+        expect(data[0]).toMatchObject({
+          id: 1,
+          firstName: 'John',
+          lastName: 'Doe',
+        });
+      },
+    };
+
+    const [addTrainee, updateTrainee] = createTraineeService(mockStorage);
+    const updatedTrainee = updateTrainee(1, 'John', 'Doe');
+
+    expect(updatedTrainee).toMatchObject({
+      id: 1,
+      firstName: 'John',
+      lastName: 'Doe',
+    });
+  });
 });
