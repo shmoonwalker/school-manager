@@ -33,7 +33,14 @@ export function createTraineeService(storage) {
     const updatedTrainees = allTrainee.filter((trainee) => trainee.id !== id);
 
     storage.saveTraineeData(updatedTrainees);
-  } 
+  }
 
-  return [addTrainee, updateTrainee, deleteTrainee];
+  function getTraineeById(id) {
+    const allTrainee = storage.loadTraineeData();
+    const trainee = allTrainee.find((t) => t.id === id);
+
+    return trainee;
+  }
+
+  return [addTrainee, updateTrainee, deleteTrainee, getTraineeById];
 }
