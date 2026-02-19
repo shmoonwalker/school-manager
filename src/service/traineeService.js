@@ -16,6 +16,11 @@ export function createTraineeService(storage) {
   }
   function updateTrainee(id, fName, lName) {
     const allTrainee = storage.loadTraineeData();
+    const idExists = allTrainee.some((t) => t.id === id);
+
+    if (!idExists) {
+      throw new Error(`ERROR: Trainee with ID ${id} does not exis`);
+    }
 
     const updatedTrainees = allTrainee.map((trainee) =>
       trainee.id === id
@@ -29,6 +34,11 @@ export function createTraineeService(storage) {
 
   function deleteTrainee(id) {
     const allTrainee = storage.loadTraineeData();
+    const idExists = allTrainee.some((t) => t.id === id);
+
+    if (!idExists) {
+      throw new Error(`ERROR: Trainee with ID ${id} does not exis`);
+    }
 
     const updatedTrainees = allTrainee.filter((trainee) => trainee.id !== id);
 
@@ -37,20 +47,30 @@ export function createTraineeService(storage) {
 
   function getTraineeById(id) {
     const allTrainee = storage.loadTraineeData();
+    const idExists = allTrainee.some((t) => t.id === id);
+
+    if (!idExists) {
+      throw new Error(`ERROR: Trainee with ID ${id} does not exis`);
+    }
+
     const trainee = allTrainee.find((t) => t.id === id);
 
     return trainee;
   }
 
-  function getAllTrainee(){
+  function getAllTrainee() {
     const allTrainee = storage.loadTraineeData();
-     const sortedTrainee = [...allTrainee].sort((a, b) =>
-    a.lastName.localeCompare(b.lastName)
-  );
-  return [sortedTrainee,allTrainee.length]
-
-
+    const sortedTrainee = [...allTrainee].sort((a, b) =>
+      a.lastName.localeCompare(b.lastName)
+    );
+    return [sortedTrainee, allTrainee.length];
   }
 
-  return [addTrainee, updateTrainee, deleteTrainee, getTraineeById,getAllTrainee];
+  return [
+    addTrainee,
+    updateTrainee,
+    deleteTrainee,
+    getTraineeById,
+    getAllTrainee,
+  ];
 }
