@@ -56,9 +56,42 @@ describe('Course Service', () => {
       ],
       saveCourseData: () => {},
     };
-    const [, updateCourse] = createCourseService(mockStorage);
+    const [addCourse, updateCourse] = createCourseService(mockStorage);
 
     expect(() => updateCourse(999, 'Updated Art', '2026-08-15')).toThrow(
+      'ERROR: Course with ID 999 does not exist'
+    );
+  });
+  test('should delete a course and return deleted course object', () => {
+    const mockStorage = {
+      loadCourseData: () => [
+        { id: 1, name: 'Art', startDate: '2025-07-02', participants: [] },
+      ],
+      saveCourseData: (data) => {
+        expect(data).toHaveLength(0);
+      },
+    };
+    const [addCourse, updateCourse, deleteCourse] =
+      createCourseService(mockStorage);
+    const deletedCourse = deleteCourse(1);
+
+    expect(deletedCourse).toMatchObject({
+      id: 1,
+      courseName: 'Art',
+    });
+  });
+
+  test('should throw error when deleting non-existent course', () => {
+    const mockStorage = {
+      loadCourseData: () => [
+        { id: 1, name: 'Art', startDate: '2025-07-02', participants: [] },
+      ],
+      saveCourseData: () => {},
+    };
+    const [addCourse, updateCourse, deleteCourse] =
+      createCourseService(mockStorage);
+
+    expect(() => deleteCourse(999)).toThrow(
       'ERROR: Course with ID 999 does not exist'
     );
   });

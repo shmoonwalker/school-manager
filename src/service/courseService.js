@@ -19,24 +19,40 @@ export function createCourseService(storage) {
 
     return newCourse;
   }
-  function updateCourse(id, courseName, courseStartDate) {
+  function updateCourse(courseId, courseName, courseStartDate) {
     const allCourse = storage.loadCourseData();
-    const idExists = allCourse.some((c) => c.id === id);
+    const idExists = allCourse.some((c) => c.id === courseId);
     if (!idExists) {
-      throw new Error(`ERROR: Course with ID ${id} does not exist`);
+      throw new Error(`ERROR: Course with ID ${courseId} does not exist`);
     }
     const updatedCourses = allCourse.map((course) =>
-      course.id === id
+      course.id === courseId
         ? { ...course, name: courseName, startDate: courseStartDate }
         : course
     );
 
     storage.saveCourseData(updatedCourses);
 
-    return { id: id, name: courseName, startDate: courseStartDate };
+    return { id: courseId, name: courseName, startDate: courseStartDate };
+  }
+  function deleteCourse(courseId) {
+    const allCourse = storage.loadCourseData();
+    const courseToDelete = allCourse.find((c) => c.id === courseId);
+
+    if (!courseToDelete) {
+      throw new Error(`ERROR: Course with ID ${courseId} does not exist`);
+    }
+
+    const updatedCourses = allCourse.filter((course) => course.id !== courseId);
+    storage.saveCourseData(updatedCourses);
+
+    return {
+      id: courseToDelete.id,
+      courseName: courseToDelete.name,
+    };
   }
 
-  return [addCourse, updateCourse];
+  return [addCourse, updateCourse, deleteCourse];
 }
 
 function checkDateIsValid(dateString) {

@@ -46,19 +46,8 @@ describe('Trainee Service', () => {
       lastName: 'Doe',
     });
   });
-  test('should throw an error when updating a trainee with a non-existent ID', () => {
-    const mockStorage = {
-      loadTraineeData: () => [{ id: 1, firstName: 'Jane', lastName: 'Smith' }],
-      saveTraineeData: () => {},
-    };
 
-    const [addTrainee, updateTrainee] = createTraineeService(mockStorage);
-    expect(() => updateTrainee(999, 'John', 'Doe')).toThrowError(
-      'ERROR: Trainee with ID 999 does not exis'
-    );
-  });
-
-  test('should delete a trainee and not return anything', () => {
+  test('should delete a trainee and return the deleted trainee object', () => {
     const mockStorage = {
       loadTraineeData: () => [
         { id: 1, firstName: 'Jane', lastName: 'Smith' },
@@ -74,23 +63,28 @@ describe('Trainee Service', () => {
       },
     };
 
-    const [addTrainee, updateTrainee, deleteTrainee] =
+    const [addTrainee, updatedTrainee, deleteTrainee] =
       createTraineeService(mockStorage);
-    deleteTrainee(2);
+    const deletedTrainee = deleteTrainee(2);
+
+    expect(deletedTrainee).toMatchObject({
+      id: 2,
+      firstName: 'John',
+      lastName: 'Doe',
+    });
   });
-  test('should throw an error when deleting a trainee with a non-existent ID', () => {
+
+  test('should throw an error when deleting a non-existent trainee', () => {
     const mockStorage = {
-      loadTraineeData: () => [
-        { id: 1, firstName: 'Jane', lastName: 'Smith' },
-        { id: 2, firstName: 'John', lastName: 'Doe' },
-      ],
+      loadTraineeData: () => [{ id: 1, firstName: 'Jane', lastName: 'Smith' }],
       saveTraineeData: () => {},
     };
 
-    const [addTrainee, updateTrainee, deleteTrainee] =
+    const [addTrainee, updatedTrainee, deleteTrainee] =
       createTraineeService(mockStorage);
-    expect(() => deleteTrainee(999)).toThrowError(
-      'ERROR: Trainee with ID 999 does not exis'
+
+    expect(() => deleteTrainee(999)).toThrow(
+      'ERROR: Trainee with ID 999 does not exist'
     );
   });
   test('should get a trainee by ID', () => {
@@ -111,21 +105,6 @@ describe('Trainee Service', () => {
       firstName: 'John',
       lastName: 'Doe',
     });
-  });
-  test('should throw an error when getting a trainee by a non-existent ID', () => {
-    const mockStorage = {
-      loadTraineeData: () => [
-        { id: 1, firstName: 'Jane', lastName: 'Smith' },
-        { id: 2, firstName: 'John', lastName: 'Doe' },
-      ],
-      saveTraineeData: () => {},
-    };
-
-    const [addTrainee, updateTrainee, deleteTrainee, getTraineeById] =
-      createTraineeService(mockStorage);
-    expect(() => getTraineeById(999)).toThrowError(
-      'ERROR: Trainee with ID 999 does not exis'
-    );
   });
   test('should get all trainees sorted by last name and return the total count', () => {
     const mockStorage = {

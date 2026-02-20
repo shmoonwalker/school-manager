@@ -14,46 +14,54 @@ export function createTraineeService(storage) {
 
     return newTrainee;
   }
-  function updateTrainee(id, fName, lName) {
+  function updateTrainee(traineeId, fName, lName) {
     const allTrainee = storage.loadTraineeData();
-    const idExists = allTrainee.some((t) => t.id === id);
+    const idExists = allTrainee.some((t) => t.id === traineeId);
 
     if (!idExists) {
-      throw new Error(`ERROR: Trainee with ID ${id} does not exist`);
+      throw new Error(`ERROR: Trainee with ID ${traineeId} does not exist`);
     }
 
     const updatedTrainees = allTrainee.map((trainee) =>
-      trainee.id === id
+      trainee.id === traineeId
         ? { ...trainee, firstName: fName, lastName: lName }
         : trainee
     );
 
     storage.saveTraineeData(updatedTrainees);
-    return { id: id, firstName: fName, lastName: lName };
+    return { id: traineeId, firstName: fName, lastName: lName };
   }
 
-  function deleteTrainee(id) {
+  function deleteTrainee(traineeId) {
     const allTrainee = storage.loadTraineeData();
-    const idExists = allTrainee.some((t) => t.id === id);
+    const traineeToDelete = allTrainee.find((t) => t.id === traineeId);
 
-    if (!idExists) {
-      throw new Error(`ERROR: Trainee with ID ${id} does not exist`);
+    if (!traineeToDelete) {
+      throw new Error(`ERROR: Trainee with ID ${traineeId} does not exist`);
     }
 
-    const updatedTrainees = allTrainee.filter((trainee) => trainee.id !== id);
+    const updatedTrainees = allTrainee.filter(
+      (trainee) => trainee.id !== traineeId
+    );
 
     storage.saveTraineeData(updatedTrainees);
+
+    return {
+      id: traineeToDelete.id,
+      firstName: traineeToDelete.firstName,
+      lastName: traineeToDelete.lastName,
+    };
   }
 
-  function getTraineeById(id) {
+  function getTraineeById(traineeId) {
     const allTrainee = storage.loadTraineeData();
-    const idExists = allTrainee.some((t) => t.id === id);
+    const idExists = allTrainee.some((t) => t.id === traineeId);
 
     if (!idExists) {
-      throw new Error(`ERROR: Trainee with ID ${id} does not exist`);
+      throw new Error(`ERROR: Trainee with ID ${traineeId} does not exist`);
     }
 
-    const trainee = allTrainee.find((t) => t.id === id);
+    const trainee = allTrainee.find((t) => t.id === traineeId);
 
     return trainee;
   }
