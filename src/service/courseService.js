@@ -14,12 +14,29 @@ export function createCourseService(storage) {
     };
     const allCourse = storage.loadCourseData();
 
-    const updatedCourse = [...allCourse, newCourse];
-    storage.saveCourseData(updatedCourse);
+    const updatedCourses = [...allCourse, newCourse];
+    storage.saveCourseData(updatedCourses);
 
     return newCourse;
   }
-  return [addCourse];
+  function updateCourse(id, courseName, courseStartDate) {
+    const allCourse = storage.loadCourseData();
+    const idExists = allCourse.some((c) => c.id === id);
+    if (!idExists) {
+      throw new Error(`ERROR: Course with ID ${id} does not exist`);
+    }
+    const updatedCourses = allCourse.map((course) =>
+      course.id === id
+        ? { ...course, name: courseName, startDate: courseStartDate }
+        : course
+    );
+
+    storage.saveCourseData(updatedCourses);
+
+    return { id: id, name: courseName, startDate: courseStartDate };
+  }
+
+  return [addCourse, updateCourse];
 }
 
 function checkDateIsValid(dateString) {

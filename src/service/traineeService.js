@@ -19,7 +19,7 @@ export function createTraineeService(storage) {
     const idExists = allTrainee.some((t) => t.id === id);
 
     if (!idExists) {
-      throw new Error(`ERROR: Trainee with ID ${id} does not exis`);
+      throw new Error(`ERROR: Trainee with ID ${id} does not exist`);
     }
 
     const updatedTrainees = allTrainee.map((trainee) =>
@@ -37,7 +37,7 @@ export function createTraineeService(storage) {
     const idExists = allTrainee.some((t) => t.id === id);
 
     if (!idExists) {
-      throw new Error(`ERROR: Trainee with ID ${id} does not exis`);
+      throw new Error(`ERROR: Trainee with ID ${id} does not exist`);
     }
 
     const updatedTrainees = allTrainee.filter((trainee) => trainee.id !== id);
@@ -50,7 +50,7 @@ export function createTraineeService(storage) {
     const idExists = allTrainee.some((t) => t.id === id);
 
     if (!idExists) {
-      throw new Error(`ERROR: Trainee with ID ${id} does not exis`);
+      throw new Error(`ERROR: Trainee with ID ${id} does not exist`);
     }
 
     const trainee = allTrainee.find((t) => t.id === id);
