@@ -12,7 +12,7 @@ function deleteCourse() {
   // TODO: Implement logic
 }
 
-function joinCourse() {
+function courseJoin() {
   // TODO: Implement logic
 }
 
