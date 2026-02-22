@@ -51,8 +51,49 @@ export function createCourseService(storage) {
       courseName: courseToDelete.name,
     };
   }
+  function getAllCoursesByTraineeId(traineeId) {
+    const allCourse = storage.loadCourseData();
+    const coursesHaveTraineeId = allCourse.filter((course) =>
+      course.participants.includes(traineeId)
+    );
+    return coursesHaveTraineeId;
+  }
+  function joinCourse(courseId, traineeId) {
+    const allCourse = storage.loadCourseData();
+    const allTrainee = storage.loadTraineeData();
+    const course = allCourse.find((c) => c.id === courseId);
+    if (!course) {
+      throw new Error(`ERROR: Course with ID ${courseId} does not exist`);
+    }
+    const trainee = allTrainee.find((t) => t.id === traineeId);
+    if (!trainee) {
+      throw new Error(`ERROR: Trainee with ID ${traineeId} does not exist`);
+    }
 
-  return [addCourse, updateCourse, deleteCourse];
+    if (course.participants.includes(traineeId)) {
+      throw new Error(`ERROR: Trainee already joined this course`);
+    }
+    if (course.participants.length >= 20) {
+      throw new Error(`ERROR: The course is full.`);
+    }
+    const coursesHaveTraineeId = getAllCoursesByTraineeId(traineeId);
+    if (coursesHaveTraineeId.length >= 5) {
+      throw new Error(
+        `ERROR: A trainee is not allowed to join more than 5 courses.`
+      );
+    }
+    
+    course.participants.push(traineeId);
+
+    storage.saveCourseData(allCourse);
+
+    return {
+      traineeName : trainee.name,
+      courseName : course.name 
+    }
+  }
+
+  return [addCourse, updateCourse, deleteCourse, getAllCoursesByTraineeId,joinCourse];
 }
 
 function checkDateIsValid(dateString) {

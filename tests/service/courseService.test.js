@@ -95,4 +95,102 @@ describe('Course Service', () => {
       'ERROR: Course with ID 999 does not exist'
     );
   });
+  test('should add trainee to course and return trainee and course names', () => {
+    const mockStorage = {
+      loadCourseData: () => [
+        { id: 1, name: 'Art', startDate: '2025-07-02', participants: [] },
+      ],
+      loadTraineeData: () => [
+        { id: 101, name: 'John Doe' },
+      ],
+      saveCourseData: (data) => {
+        expect(data[0].participants).toContain(101);
+      },
+    };
+    const [, , , , joinCourse] = createCourseService(mockStorage);
+    const result = joinCourse(1, 101);
+
+    expect(result).toMatchObject({
+      traineeName: 'John Doe',
+      courseName: 'Art',
+    });
+  });
+
+  test('should throw error when joining non-existent course', () => {
+    const mockStorage = {
+      loadCourseData: () => [],
+      loadTraineeData: () => [{ id: 101, name: 'John Doe' }],
+      saveCourseData: () => {},
+    };
+    const [, , , , joinCourse] = createCourseService(mockStorage);
+
+    expect(() => joinCourse(999, 101)).toThrow(
+      'ERROR: Course with ID 999 does not exist'
+    );
+  });
+
+  test('should throw error when trainee does not exist', () => {
+    const mockStorage = {
+      loadCourseData: () => [
+        { id: 1, name: 'Art', startDate: '2025-07-02', participants: [] },
+      ],
+      loadTraineeData: () => [],
+      saveCourseData: () => {},
+    };
+    const [, , , , joinCourse] = createCourseService(mockStorage);
+
+    expect(() => joinCourse(1, 999)).toThrow(
+      'ERROR: Trainee with ID 999 does not exist'
+    );
+  });
+
+  test('should throw error when trainee already joined the course', () => {
+    const mockStorage = {
+      loadCourseData: () => [
+        { id: 1, name: 'Art', startDate: '2025-07-02', participants: [101] },
+      ],
+      loadTraineeData: () => [{ id: 101, name: 'John Doe' }],
+      saveCourseData: () => {},
+    };
+    const [, , , , joinCourse] = createCourseService(mockStorage);
+
+    expect(() => joinCourse(1, 101)).toThrow(
+      'ERROR: Trainee already joined this course'
+    );
+  });
+
+  test('should throw error when course is full', () => {
+    const mockStorage = {
+      loadCourseData: () => [
+        { id: 1, name: 'Art', startDate: '2025-07-02', participants: Array(20).fill(1) },
+      ],
+      loadTraineeData: () => [{ id: 101, name: 'John Doe' }],
+      saveCourseData: () => {},
+    };
+    const [, , , , joinCourse] = createCourseService(mockStorage);
+
+    expect(() => joinCourse(1, 101)).toThrow(
+      'ERROR: The course is full.'
+    );
+  });
+
+  test('should throw error when trainee already enrolled in 5 courses', () => {
+    const mockStorage = {
+      loadCourseData: () => [
+        { id: 1, name: 'Art', startDate: '2025-07-02', participants: [] },
+        { id: 2, name: 'Math', startDate: '2025-07-02', participants: [101] },
+        { id: 3, name: 'Science', startDate: '2025-07-02', participants: [101] },
+        { id: 4, name: 'History', startDate: '2025-07-02', participants: [101] },
+        { id: 5, name: 'English', startDate: '2025-07-02', participants: [101] },
+        { id: 6, name: 'PE', startDate: '2025-07-02', participants: [101] },
+      ],
+      loadTraineeData: () => [{ id: 101, name: 'John Doe' }],
+      saveCourseData: () => {},
+    };
+    const [, , , , joinCourse] = createCourseService(mockStorage);
+
+    expect(() => joinCourse(1, 101)).toThrow(
+      'ERROR: A trainee is not allowed to join more than 5 courses.'
+    );
+  });
 });
