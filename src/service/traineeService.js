@@ -55,14 +55,11 @@ export function createTraineeService(storage) {
 
   function getTraineeById(traineeId) {
     const allTrainee = storage.loadTraineeData();
-    const idExists = allTrainee.some((t) => t.id === traineeId);
-
-    if (!idExists) {
-      throw new Error(`ERROR: Trainee with ID ${traineeId} does not exist`);
-    }
-
     const trainee = allTrainee.find((t) => t.id === traineeId);
 
+    if (!trainee) {
+      throw new Error(`ERROR: Trainee with ID ${traineeId} does not exist`);
+    }
     return trainee;
   }
 

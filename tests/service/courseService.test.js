@@ -270,4 +270,37 @@ describe('Course Service', () => {
       'ERROR: The Trainee did not join the course'
     );
   });
+  test('should return course by ID', () => {
+    const mockStorage = {
+      loadCourseData: () => [
+        { id: 1, name: 'Art', startDate: '2025-07-02', participants: [] },
+        { id: 2, name: 'Math', startDate: '2025-07-02', participants: [] },
+      ],
+      loadTraineeData: () => [],
+      saveCourseData: () => {},
+    };
+    const [, , , , , , getCourseById] = createCourseService(mockStorage);
+    const course = getCourseById(1);
+
+    expect(course).toMatchObject({
+      id: 1,
+      name: 'Art',
+      startDate: '2025-07-02',
+      participants: [],
+    });
+  });
+
+  test('should throw error when getting non-existent course by ID', () => {
+    const mockStorage = {
+      loadCourseData: () => [
+        { id: 1, name: 'Art', startDate: '2025-07-02', participants: [] },
+      ],
+      loadTraineeData: () => [],
+    };
+    const [, , , , , , getCourseById] = createCourseService(mockStorage);
+
+    expect(() => getCourseById(999)).toThrow(
+      'ERROR: Course with ID 999 does not exist'
+    );
+  });
 });

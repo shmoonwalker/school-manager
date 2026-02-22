@@ -124,6 +124,24 @@ export function createCourseService(storage) {
     };
   }
 
+  function getCourseById(courseId) {
+    const allCourse = storage.loadCourseData();
+    const allTrainee = storage.loadTraineeData();
+    const course = allCourse.find((c) => c.id === courseId);
+    if (!course) {
+      throw new Error(`ERROR: Course with ID ${courseId} does not exist`);
+    }
+
+    const updatedCourseParticipants = [];
+    course.participants.forEach((traineeId) => {
+      const trainee = allTrainee.find((t) => t.id === traineeId);
+      updatedCourseParticipants.push(trainee);
+    });
+    course.participants = updatedCourseParticipants;
+
+    return course;
+  }
+
   return [
     addCourse,
     updateCourse,
@@ -131,6 +149,7 @@ export function createCourseService(storage) {
     getAllCoursesByTraineeId,
     courseJoin,
     courseLeave,
+    getCourseById,
   ];
 }
 
