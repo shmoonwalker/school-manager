@@ -323,7 +323,7 @@ describe('Course Service', () => {
       saveCourseData: () => {},
     };
 
-    const [, , , , , , , courseGetAll ]= createCourseService(mockStorage);
+    const [, , , , , , , courseGetAll] = createCourseService(mockStorage);
 
     const courses = courseGetAll();
 
