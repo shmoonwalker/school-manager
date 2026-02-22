@@ -303,4 +303,49 @@ describe('Course Service', () => {
       'ERROR: Course with ID 999 does not exist'
     );
   });
+  test('should return all courses sorted with computed fields', () => {
+    const mockStorage = {
+      loadCourseData: () => [
+        {
+          id: 1,
+          name: 'Art',
+          startDate: '2025-07-03',
+          participants: Array(20).fill(1),
+        },
+        {
+          id: 2,
+          name: 'Math',
+          startDate: '2025-07-02',
+          participants: [1, 2, 3],
+        },
+      ],
+      loadTraineeData: () => [],
+      saveCourseData: () => {},
+    };
+
+    const [, , , , , , , courseGetAll ]= createCourseService(mockStorage);
+
+    const courses = courseGetAll();
+
+    expect(courses).toHaveLength(2);
+
+    expect(courses[0].id).toBe(2);
+    expect(courses[1].id).toBe(1);
+
+    expect(courses[0]).toEqual({
+      id: 2,
+      name: 'Math',
+      startDate: '2025-07-02',
+      numberOfParticipants: 3,
+      isFull: false,
+    });
+
+    expect(courses[1]).toEqual({
+      id: 1,
+      name: 'Art',
+      startDate: '2025-07-03',
+      numberOfParticipants: 20,
+      isFull: true,
+    });
+  });
 });

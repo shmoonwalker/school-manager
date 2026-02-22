@@ -142,6 +142,21 @@ export function createCourseService(storage) {
     return course;
   }
 
+  function courseGetAll() {
+    const allCourse = storage.loadCourseData();
+    const result = allCourse.map((course) => {
+      return {
+        id: course.id,
+        name: course.name,
+        startDate: course.startDate,
+        numberOfParticipants: course.participants.length,
+        isFull: course.participants.length >= 20 ? true : false,
+      };
+    });
+    result.sort((a, b) => a.startDate.localeCompare(b.startDate));
+    return result;
+  }
+
   return [
     addCourse,
     updateCourse,
@@ -150,6 +165,7 @@ export function createCourseService(storage) {
     courseJoin,
     courseLeave,
     getCourseById,
+    courseGetAll,
   ];
 }
 
