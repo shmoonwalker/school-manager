@@ -1,4 +1,3 @@
-
 export function createTraineeService(storage) {
   function addTrainee(fName, lName) {
     let traineeId = Math.floor(Math.random() * 100000);

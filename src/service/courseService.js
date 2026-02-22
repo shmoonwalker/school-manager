@@ -58,7 +58,7 @@ export function createCourseService(storage) {
     );
     return coursesHaveTraineeId;
   }
-  function joinCourse(courseId, traineeId) {
+  function courseJoin(courseId, traineeId) {
     const allCourse = storage.loadCourseData();
     const allTrainee = storage.loadTraineeData();
     const course = allCourse.find((c) => c.id === courseId);
@@ -82,18 +82,56 @@ export function createCourseService(storage) {
         `ERROR: A trainee is not allowed to join more than 5 courses.`
       );
     }
-    
+
     course.participants.push(traineeId);
 
     storage.saveCourseData(allCourse);
 
     return {
-      traineeName : trainee.name,
-      courseName : course.name 
-    }
+      traineeName: trainee.name,
+      courseName: course.name,
+    };
   }
 
-  return [addCourse, updateCourse, deleteCourse, getAllCoursesByTraineeId,joinCourse];
+  function courseLeave(courseId, traineeId) {
+    const allCourse = storage.loadCourseData();
+    const allTrainee = storage.loadTraineeData();
+    const course = allCourse.find((c) => c.id === courseId);
+    if (!course) {
+      throw new Error(`ERROR: Course with ID ${courseId} does not exist`);
+    }
+    const trainee = allTrainee.find((t) => t.id === traineeId);
+    if (!trainee) {
+      throw new Error(`ERROR: Trainee with ID ${traineeId} does not exist`);
+    }
+    if (!course.participants.includes(traineeId)) {
+      throw new Error(`ERROR: The Trainee did not join the course`);
+    }
+    const updatedCourses = allCourse.map((course) =>
+      course.id === courseId
+        ? {
+            ...course,
+            participants: course.participants.filter((id) => id !== traineeId),
+          }
+        : course
+    );
+
+    storage.saveCourseData(updatedCourses);
+
+    return {
+      traineeName: trainee.name,
+      courseName: course.name,
+    };
+  }
+
+  return [
+    addCourse,
+    updateCourse,
+    deleteCourse,
+    getAllCoursesByTraineeId,
+    courseJoin,
+    courseLeave,
+  ];
 }
 
 function checkDateIsValid(dateString) {
