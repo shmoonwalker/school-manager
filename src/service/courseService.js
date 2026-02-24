@@ -6,14 +6,21 @@ export function createCourseService(storage) {
         `ERROR: Invalid start date. Must be in yyyy-MM-dd format`
       );
     }
+
+    const allCourse = storage.loadCourseData();
+    while (true) {
+      const idExists = allCourse.some((c) => c.id === courseId);
+      if (!idExists) {
+        break;
+      }
+      courseId = Math.floor(Math.random() * 100000);
+    }
     const newCourse = {
       id: courseId,
       name: courseName,
       startDate: courseStartDate,
       participants: [],
     };
-    const allCourse = storage.loadCourseData();
-
     const updatedCourses = [...allCourse, newCourse];
     storage.saveCourseData(updatedCourses);
 
@@ -46,10 +53,7 @@ export function createCourseService(storage) {
     const updatedCourses = allCourse.filter((course) => course.id !== courseId);
     storage.saveCourseData(updatedCourses);
 
-    return {
-      id: courseToDelete.id,
-      courseName: courseToDelete.name,
-    };
+    return courseToDelete;
   }
   function getAllCoursesByTraineeId(traineeId) {
     const allCourse = storage.loadCourseData();
@@ -88,7 +92,7 @@ export function createCourseService(storage) {
     storage.saveCourseData(allCourse);
 
     return {
-      traineeName: trainee.name,
+      traineeName: `${trainee.firstName} ${trainee.lastName}`,
       courseName: course.name,
     };
   }
@@ -119,7 +123,7 @@ export function createCourseService(storage) {
     storage.saveCourseData(updatedCourses);
 
     return {
-      traineeName: trainee.name,
+      traineeName: `${trainee.firstName} ${trainee.lastName}`,
       courseName: course.name,
     };
   }
@@ -132,29 +136,40 @@ export function createCourseService(storage) {
       throw new Error(`ERROR: Course with ID ${courseId} does not exist`);
     }
 
-    const updatedCourseParticipants = [];
-    course.participants.forEach((traineeId) => {
-      const trainee = allTrainee.find((t) => t.id === traineeId);
-      updatedCourseParticipants.push(trainee);
-    });
-    course.participants = updatedCourseParticipants;
+    const participants = course.participants
+      .map((traineeId) => {
+        const trainee = allTrainee.find((t) => t.id === traineeId);
+        if (!trainee) return null;
+        return `${trainee.id} ${trainee.firstName} ${trainee.lastName}`;
+      })
+      .filter(Boolean);
 
-    return course;
+    return {
+      id: course.id,
+      name: course.name,
+      startDate: course.startDate,
+      participants,
+    };
   }
 
   function courseGetAll() {
     const allCourse = storage.loadCourseData();
-    const result = allCourse.map((course) => {
-      return {
+
+    return allCourse
+      .map((course) => ({
         id: course.id,
         name: course.name,
         startDate: course.startDate,
         numberOfParticipants: course.participants.length,
-        isFull: course.participants.length >= 20 ? true : false,
-      };
-    });
-    result.sort((a, b) => a.startDate.localeCompare(b.startDate));
-    return result;
+        isFull: course.participants.length >= 20 ? 'FULL' : '',
+      }))
+      .sort((a, b) => new Date(a.startDate) - new Date(b.startDate));
+  }
+  function checkDateIsValid(dateString) {
+    const regex = /^\d{4}-\d{2}-\d{2}$/;
+    if (!regex.test(dateString)) return false;
+    const date = new Date(dateString);
+    return date instanceof Date && !isNaN(date);
   }
 
   return [
@@ -166,12 +181,6 @@ export function createCourseService(storage) {
     courseLeave,
     getCourseById,
     courseGetAll,
+    checkDateIsValid,
   ];
-}
-
-function checkDateIsValid(dateString) {
-  const regex = /^\d{4}-\d{2}-\d{2}$/;
-  if (!regex.test(dateString)) return false;
-  const date = new Date(dateString);
-  return date instanceof Date && !isNaN(date);
 }

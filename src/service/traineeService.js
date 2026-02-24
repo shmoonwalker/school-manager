@@ -2,13 +2,19 @@ export function createTraineeService(storage) {
   function addTrainee(fName, lName) {
     let traineeId = Math.floor(Math.random() * 100000);
 
+    const allTrainee = storage.loadTraineeData();
+    while (true) {
+      const idExists = allTrainee.some((t) => t.id === traineeId);
+      if (!idExists) {
+        break;
+      }
+      traineeId = Math.floor(Math.random() * 100000);
+    }
     const newTrainee = {
       id: traineeId,
       firstName: fName,
       lastName: lName,
     };
-    const allTrainee = storage.loadTraineeData();
-
     const updatedTrainees = [...allTrainee, newTrainee];
     storage.saveTraineeData(updatedTrainees);
 
@@ -16,7 +22,7 @@ export function createTraineeService(storage) {
   }
   function updateTrainee(traineeId, fName, lName) {
     const allTrainee = storage.loadTraineeData();
-    const idExists = allTrainee.some((t) => t.id === traineeId);
+    const idExists = allTrainee.find((t) => t.id === traineeId);
 
     if (!idExists) {
       throw new Error(`ERROR: Trainee with ID ${traineeId} does not exist`);
@@ -56,11 +62,14 @@ export function createTraineeService(storage) {
   function getTraineeById(traineeId) {
     const allTrainee = storage.loadTraineeData();
     const trainee = allTrainee.find((t) => t.id === traineeId);
-
+    const allCourse = storage.loadCourseData();
+    const coursesHaveTraineeId = allCourse
+      .filter((course) => course.participants.includes(traineeId))
+      .map((course) => course.name);
     if (!trainee) {
       throw new Error(`ERROR: Trainee with ID ${traineeId} does not exist`);
     }
-    return trainee;
+    return { trainee, coursesHaveTraineeId };
   }
 
   function getAllTrainee() {
@@ -68,7 +77,7 @@ export function createTraineeService(storage) {
     const sortedTrainee = [...allTrainee].sort((a, b) =>
       a.lastName.localeCompare(b.lastName)
     );
-    return [sortedTrainee, allTrainee.length];
+    return sortedTrainee;
   }
 
   return [
