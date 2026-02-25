@@ -7,6 +7,11 @@ const input = prompt();
 while (true) {
   let userInput = input(style.id('> '));
 
+  if (userInput === null) {
+    console.log('\n' + style.warningMessage('Goodbye.'));
+    process.exit(0);
+  }
+
   if (userInput.toUpperCase() === 'EXIT') {
     console.log(style.warningMessage('Goodbye.'));
     break;

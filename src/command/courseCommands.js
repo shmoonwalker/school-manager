@@ -64,6 +64,24 @@ function leaveCourseCommand(args) {
   return `${result.traineeName} Left ${result.courseName}`;
 }
 
+function getCourseCommand(args) {
+  const [id] = args;
+
+  if (!id) {
+    throw new Error('ERROR: Must provide ID.');
+  }
+
+  const result = getCourseById(Number(id));
+
+  const participantsOutput =
+    result.participants.length > 0
+      ? `Participants (${result.participants.length}):\n- ${result.participants.join('\n- ')}`
+      : 'Participants (0):';
+
+  return `${result.id} ${result.name} ${result.startDate}
+  ${participantsOutput}`;
+}
+
 function getAllCoursesCommand() {
   const courses = courseGetAll();
 
