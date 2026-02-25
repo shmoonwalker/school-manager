@@ -1,6 +1,28 @@
-import { parseCommand } from "./command-parser.js";
+import { parseCommand } from './command-parser.js';
+import prompt from 'prompt-sync';
+import { style } from '../style/style.js';
 
-// This is the entry point of your application. 
-// Ask user for input, parse the command, and call the appropriate function from courseCommands.js or traineeCommands.js based on the command.
+const input = prompt();
 
-console.log('Hello world');
+while (true) {
+  let userInput = input(style.id('> '));
+
+  if (userInput === null) {
+    console.log('\n' + style.warningMessage('Goodbye.'));
+    process.exit(0);
+  }
+
+  if (userInput.toUpperCase() === 'EXIT') {
+    console.log(style.warningMessage('Goodbye.'));
+    break;
+  }
+
+  userInput = userInput.split(' ');
+
+  try {
+    const result = parseCommand(userInput);
+    console.log(style.successMessage(result));
+  } catch (err) {
+    console.error(style.errorMessage(err.message));
+  }
+}

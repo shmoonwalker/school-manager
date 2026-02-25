@@ -62,22 +62,26 @@ describe('Course Service', () => {
       'ERROR: Course with ID 999 does not exist'
     );
   });
+
   test('should delete a course and return deleted course object', () => {
     const mockStorage = {
       loadCourseData: () => [
         { id: 1, name: 'Art', startDate: '2025-07-02', participants: [] },
+        { id: 2, name: 'Math', startDate: '2025-07-02', participants: [] },
       ],
       saveCourseData: (data) => {
-        expect(data).toHaveLength(0);
+        expect(data).toHaveLength(1);
+        expect(data[0].id).toBe(2);
       },
     };
-    const [addCourse, updateCourse, deleteCourse] =
-      createCourseService(mockStorage);
-    const deletedCourse = deleteCourse(1);
+    const [, , deleteCourse] = createCourseService(mockStorage);
+    const deleted = deleteCourse(1);
 
-    expect(deletedCourse).toMatchObject({
+    expect(deleted).toMatchObject({
       id: 1,
-      courseName: 'Art',
+      name: 'Art',
+      startDate: '2025-07-02',
+      participants: [],
     });
   });
 
@@ -88,8 +92,7 @@ describe('Course Service', () => {
       ],
       saveCourseData: () => {},
     };
-    const [addCourse, updateCourse, deleteCourse] =
-      createCourseService(mockStorage);
+    const [, , deleteCourse] = createCourseService(mockStorage);
 
     expect(() => deleteCourse(999)).toThrow(
       'ERROR: Course with ID 999 does not exist'
@@ -100,7 +103,7 @@ describe('Course Service', () => {
       loadCourseData: () => [
         { id: 1, name: 'Art', startDate: '2025-07-02', participants: [] },
       ],
-      loadTraineeData: () => [{ id: 101, name: 'John Doe' }],
+      loadTraineeData: () => [{ id: 101, firstName: 'John', lastName: 'Doe' }],
       saveCourseData: (data) => {
         expect(data[0].participants).toContain(101);
       },
@@ -117,7 +120,7 @@ describe('Course Service', () => {
   test('should throw error when joining non-existent course', () => {
     const mockStorage = {
       loadCourseData: () => [],
-      loadTraineeData: () => [{ id: 101, name: 'John Doe' }],
+      loadTraineeData: () => [{ id: 101, name: 'John', lastName: 'Doe' }],
       saveCourseData: () => {},
     };
     const [, , , , courseJoin] = createCourseService(mockStorage);
@@ -214,7 +217,7 @@ describe('Course Service', () => {
       loadCourseData: () => [
         { id: 1, name: 'Art', startDate: '2025-07-02', participants: [101] },
       ],
-      loadTraineeData: () => [{ id: 101, name: 'John Doe' }],
+      loadTraineeData: () => [{ id: 101, firstName: 'John', lastName: 'Doe' }],
       saveCourseData: (data) => {
         expect(data[0].participants).not.toContain(101);
       },
@@ -337,7 +340,7 @@ describe('Course Service', () => {
       name: 'Math',
       startDate: '2025-07-02',
       numberOfParticipants: 3,
-      isFull: false,
+      isFull: '',
     });
 
     expect(courses[1]).toEqual({
@@ -345,7 +348,7 @@ describe('Course Service', () => {
       name: 'Art',
       startDate: '2025-07-03',
       numberOfParticipants: 20,
-      isFull: true,
+      isFull: 'FULL',
     });
   });
 });
